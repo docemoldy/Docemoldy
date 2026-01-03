@@ -376,10 +376,30 @@
             signInWithEmailAndPassword(auth, e, p).catch(err => { alert(err.message); btnLogin.innerText="Entrar"; });
         });
         document.getElementById('btnSair').addEventListener('click', () => signOut(auth));
-        onAuthStateChanged(auth, u => {
-            document.getElementById('login-screen').style.display = u ? 'none' : 'flex';
-            if(u) carregar();
+          const ADMIN_EMAIL = "ramon.psn1990@gmail.com"; 
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Se o e-mail logado FOR IGUAL ao e-mail do dono
+                if (user.email === ADMIN_EMAIL) {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('dashboard-content').style.display = 'flex';
+                    carregarLista(); // Carrega os produtos
+                } else {
+                    // Se for cliente tentando entrar
+                    alert("⛔ ACESSO NEGADO! Esta área é restrita.");
+                    signOut(auth); // Desloga a pessoa na hora
+                    document.getElementById('login-screen').style.display = 'flex';
+                }
+            } else {
+                // Ninguém logado
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('dashboard-content').style.display = 'none';
+                document.getElementById('btnLogin').innerText = "Entrar";
+            }
         });
     </script>
+</body>
+</html>
 </body>
 </html>
