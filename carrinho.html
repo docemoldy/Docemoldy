@@ -7,78 +7,175 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #8B5CF6; 
-            --bg-body: #F3F4F6;
-            --white: #FFFFFF;
-            --text-dark: #1F2937;
-            --radius: 16px;
-        }
-        body { font-family: 'Nunito', sans-serif; background: var(--bg-body); color: var(--text-dark); padding: 40px 20px; }
-        .container { max-width: 700px; margin: 0 auto; background: var(--white); padding: 30px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        :root { --primary: #8B5CF6; --bg: #F3F4F6; --white: #FFFFFF; --text: #1F2937; --radius: 16px; }
+        body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); padding: 40px 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: var(--white); padding: 30px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         
         h1 { color: var(--primary); margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f3f4f6; }
-        .item-left { display: flex; gap: 15px; align-items: center; }
-        .item-img { width: 60px; height: 60px; border-radius: 10px; background: #eee; object-fit: cover; }
-        .item-title { font-weight: 700; font-size: 1rem; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #f3f4f6; }
+        .item-left { display: flex; gap: 20px; align-items: center; }
+        .item-img { width: 70px; height: 70px; border-radius: 10px; background: #eee; object-fit: cover; }
+        .item-title { font-weight: 700; }
         .item-price { color: var(--primary); font-weight: 800; }
         .btn-remove { color: #EF4444; background: none; border: none; cursor: pointer; font-size: 1.2rem; }
 
-        .total-area { margin-top: 30px; text-align: right; font-size: 1.5rem; font-weight: 800; }
-        
-        .btn-checkout {
-            display: block; width: 100%; background: #25D366; color: white; text-align: center;
-            padding: 15px; border-radius: 12px; font-weight: 700; font-size: 1.1rem;
-            text-decoration: none; margin-top: 20px; transition: 0.2s;
-        }
-        .btn-checkout:hover { opacity: 0.9; }
-        
+        /* ÁREA DE DESCONTO (MOEDAS) */
+        .discount-area { background: #FFFBEB; border: 1px solid #FCD34D; padding: 15px; border-radius: 10px; margin-top: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .coin-label { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #B45309; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #F59E0B; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .total-area { margin-top: 30px; text-align: right; }
+        .subtotal { font-size: 1rem; color: #666; }
+        .final-total { font-size: 1.8rem; font-weight: 800; color: #1F2937; }
+        .discount-text { color: #10B981; font-weight: bold; font-size: 0.9rem; }
+
+        .btn-checkout { display: block; width: 100%; background: #25D366; color: white; padding: 18px; border-radius: 12px; font-weight: 800; text-align: center; text-decoration: none; margin-top: 20px; font-size: 1.1rem; }
         .btn-back { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; }
+        
+        /* Oculto se não tiver login */
+        #coin-section { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1><i class="fa-solid fa-cart-shopping"></i> Seu Pedido</h1>
-        
-        <div id="lista">
-            <!-- Itens JS -->
+        <h1>Seu Carrinho</h1>
+        <div id="lista"></div>
+
+        <!-- SEÇÃO DE MOEDAS -->
+        <div id="coin-section" class="discount-area">
+            <div class="coin-label">
+                <i class="fa-solid fa-coins"></i>
+                <div>
+                    <span>Usar minhas <span id="coin-balance">0</span> DoceCoins</span>
+                    <div style="font-size:0.75rem; font-weight:normal;">Desconto disponível: <span id="coin-discount-val">R$ 0,00</span></div>
+                </div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="coin-toggle" onchange="calcularTotal()">
+                <span class="slider"></span>
+            </label>
         </div>
 
-        <div class="total-area" id="total-area">
-            Total: <span style="color:var(--primary)" id="valor-total">R$ 0,00</span>
+        <div class="total-area">
+            <div class="subtotal">Subtotal: <span id="subtotal-val">R$ 0,00</span></div>
+            <div id="discount-display" class="discount-text" style="display:none;">- Desconto: <span id="discount-val">R$ 0,00</span></div>
+            <div class="final-total">Total: <span id="final-val" style="color:var(--primary)">R$ 0,00</span></div>
         </div>
 
-        <a href="#" id="btn-whats" class="btn-checkout">
-            <i class="fa-brands fa-whatsapp"></i> Enviar Pedido no WhatsApp
-        </a>
+        <a href="#" id="btn-whats" class="btn-checkout"><i class="fa-brands fa-whatsapp"></i> Finalizar Pedido</a>
         <a href="index.html" class="btn-back">Continuar Comprando</a>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyASxticHF-jnuOj2xcHm0Jc3P4U0ZOzF10",
+            authDomain: "doce-moldy.firebaseapp.com",
+            projectId: "doce-moldy",
+            storageBucket: "doce-moldy.firebasestorage.app",
+            messagingSenderId: "965940506290",
+            appId: "1:965940506290:web:0067cfc07ad49399eb23ab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let userCoins = 0;
+        let currentUser = null;
+        let totalCarrinho = 0;
+
+        // AUTH & MOEDAS
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    userCoins = docSnap.data().coins || 0;
+                    if (userCoins > 0) {
+                        document.getElementById('coin-section').style.display = 'flex';
+                        document.getElementById('coin-balance').innerText = userCoins;
+                        // 10 moedas = R$ 1.00
+                        const discount = userCoins / 10;
+                        document.getElementById('coin-discount-val').innerText = discount.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+                    }
+                }
+            }
+        });
+
+        window.calcularTotal = () => {
+            const usarMoedas = document.getElementById('coin-toggle').checked;
+            let desconto = 0;
+            
+            // Regra: 10 moedas = 1 real
+            if (usarMoedas) {
+                desconto = userCoins / 10;
+                // Não pode dar desconto maior que o total
+                if (desconto > totalCarrinho) desconto = totalCarrinho;
+            }
+
+            const totalFinal = totalCarrinho - desconto;
+
+            document.getElementById('discount-val').innerText = desconto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            document.getElementById('discount-display').style.display = usarMoedas ? 'block' : 'none';
+            document.getElementById('final-val').innerText = totalFinal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+            atualizarLinkWhats(totalFinal, desconto, usarMoedas);
+        }
+
+        function atualizarLinkWhats(total, desconto, usouMoedas) {
+            const itens = JSON.parse(localStorage.getItem('carrinho_doce_moldy')) || [];
+            let msg = "Olá! Gostaria de finalizar meu pedido:%0A%0A";
+            itens.forEach(i => msg += `▪️ ${i.nome} - ${i.preco}%0A`);
+            
+            if(usouMoedas) {
+                msg += `%0A🎁 *Desconto DoceCoins aplicado: - R$ ${desconto.toFixed(2)}*`;
+                // Aqui no mundo real descontaríamos do banco, mas via zap avisamos o atendente
+                msg += ` (Cliente usou ${userCoins} moedas)`;
+            }
+
+            // Ganho de novas moedas (1 por real gasto)
+            const moedasGanhas = Math.floor(total);
+            msg += `%0A💰 *Total a Pagar: R$ ${total.toFixed(2)}*`;
+            msg += `%0A%0A✨ *Vou ganhar: ${moedasGanhas} novas DoceCoins!*`;
+
+            document.getElementById('btn-whats').href = `https://wa.me/5511999999999?text=${msg}`;
+            
+            // Listener para limpar moedas SE clicar em finalizar (Simulação)
+            document.getElementById('btn-whats').onclick = async () => {
+                if(usouMoedas && currentUser) {
+                    // Zera as moedas do usuário no banco pq ele "gastou" no zap
+                    // No mundo real, faríamos isso só após confirmação de pagamento
+                    // Aqui é só para demonstração do fluxo
+                    // await updateDoc(doc(db, "users", currentUser.uid), { coins: 0 });
+                }
+            }
+        }
+
         function carregar() {
             const itens = JSON.parse(localStorage.getItem('carrinho_doce_moldy')) || [];
             const lista = document.getElementById('lista');
-            const totalEl = document.getElementById('valor-total');
-            const btn = document.getElementById('btn-whats');
             
             lista.innerHTML = "";
-            let total = 0;
-            let msg = "Olá! Gostaria de fazer o pedido:%0A%0A";
+            totalCarrinho = 0;
 
             if(itens.length === 0) {
-                lista.innerHTML = "<p style='text-align:center; padding:20px; color:#999'>Seu carrinho está vazio.</p>";
-                document.getElementById('total-area').style.display = 'none';
-                btn.style.display = 'none';
+                lista.innerHTML = "<p style='text-align:center'>Carrinho vazio</p>";
                 return;
             }
 
             itens.forEach((item, i) => {
-                // Tenta converter preço string em numero
-                let precoClean = parseFloat(item.preco.replace('R$', '').replace('.', '').replace(',', '.').trim()) || 0;
-                total += precoClean;
-                msg += `▪️ ${item.nome} (${item.preco})%0A`;
+                let p = parseFloat(item.preco.replace('R$', '').replace('.', '').replace(',', '.').trim()) || 0;
+                totalCarrinho += p;
 
                 lista.innerHTML += `
                     <div class="cart-item">
@@ -89,16 +186,13 @@
                                 <div class="item-price">${item.preco}</div>
                             </div>
                         </div>
-                        <button class="btn-remove" onclick="remover(${i})"><i class="fa-solid fa-trash"></i></button>
+                        <button class="btn-remove" onclick="window.remover(${i})"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 `;
             });
 
-            let totalFormatado = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            totalEl.innerText = totalFormatado;
-            
-            msg += `%0A💰 *Total: ${totalFormatado}*`;
-            btn.href = `https://wa.me/5511999999999?text=${msg}`;
+            document.getElementById('subtotal-val').innerText = totalCarrinho.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            calcularTotal(); // Chama calculo inicial
         }
 
         window.remover = (i) => {
