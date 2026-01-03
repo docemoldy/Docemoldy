@@ -5,68 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entrar | Doce Moldy</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --primary: #8B5CF6; --bg: #F3F4F6; --white: #FFFFFF; --radius: 16px; }
         body { font-family: 'Nunito', sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
-        
         .card { background: var(--white); padding: 40px; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { font-size: 0.85rem; font-weight: 700; color: #4B5563; margin-left: 5px; }
-        input { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; outline: none; margin-top: 5px; transition: 0.3s; }
-        input:focus { border-color: var(--primary); }
-
-        .btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 1rem; }
-        .btn:hover { opacity: 0.9; }
-
+        input { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; outline: none; margin-top: 5px; transition: 0.3s; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; font-size: 1rem; }
         .btn-google { background: white; color: #333; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; }
-        .btn-google:hover { background: #f9f9f9; }
-        
-        .divider { margin: 20px 0; color: #999; font-size: 0.8rem; display: flex; align-items: center; gap: 10px; }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #eee; }
-
         .toggle-btn { background: none; color: var(--primary); border: none; cursor: pointer; margin-top: 15px; font-size: 0.9rem; text-decoration: underline; }
         .status { margin-top: 10px; font-size: 0.9rem; min-height: 20px; color: #EF4444; }
-        
-        #nameField { display: none; } /* Oculto no login */
+        #nameField { display: none; margin-bottom: 10px; text-align: left; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div style="margin-bottom: 20px;">
-            <img src="logo_site.png" style="height: 40px;" onerror="this.style.display='none'">
-        </div>
+        <img src="logo_site.png" style="height: 40px; margin-bottom:20px;" onerror="this.style.display='none'">
         <h2 id="title" style="color:#333; margin-bottom:5px;">Bem-vindo</h2>
         <p style="color:#666; margin-bottom:20px; font-size:0.9rem;">Acesse sua conta Doce Moldy.</p>
         
         <button class="btn btn-google" id="btnGoogle">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
-            Continuar com Google
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Continuar com Google
         </button>
 
-        <div class="divider">OU USE SEU E-MAIL</div>
+        <div style="margin:20px 0; color:#ccc;">— OU —</div>
 
-        <div class="input-group" id="nameField">
-            <label>Nome Completo</label>
+        <div id="nameField">
+            <label style="font-size:0.8rem; font-weight:700; color:#666;">Nome Completo</label>
             <input type="text" id="name" placeholder="Seu nome">
         </div>
 
-        <div class="input-group">
-            <label>E-mail</label>
-            <input type="email" id="email" placeholder="exemplo@email.com">
-        </div>
-
-        <div class="input-group">
-            <label>Senha</label>
-            <input type="password" id="password" placeholder="••••••••">
-        </div>
+        <input type="email" id="email" placeholder="E-mail">
+        <input type="password" id="password" placeholder="Senha">
         
         <div id="status" class="status"></div>
 
         <button class="btn" id="btnAction">Entrar</button>
         <button class="toggle-btn" id="btnToggle">Criar conta nova</button>
-        
         <a href="index.html" style="display:block; margin-top:20px; color:#999; text-decoration:none; font-size:0.9rem;">← Voltar para Loja</a>
     </div>
 
@@ -92,7 +66,6 @@
         let isLogin = true;
         const statusEl = document.getElementById('status');
 
-        // Alternar Login/Cadastro
         document.getElementById('btnToggle').addEventListener('click', () => {
             isLogin = !isLogin;
             document.getElementById('title').innerText = isLogin ? "Bem-vindo" : "Criar Conta";
@@ -102,35 +75,14 @@
             statusEl.innerText = "";
         });
 
-        // Login com Google
         document.getElementById('btnGoogle').addEventListener('click', async () => {
             try {
                 const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                
-                // Verifica se usuário já existe no banco, se não, cria
-                const docRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(docRef);
-                
-                if (!docSnap.exists()) {
-                    await setDoc(docRef, {
-                        email: user.email,
-                        name: user.displayName,
-                        coins: 50, // Bônus
-                        cart: [], favs: []
-                    });
-                }
-                
-                // Sincroniza e redireciona
-                await syncData(user.uid);
+                await checkAndCreateUser(result.user);
                 window.location.href = "index.html"; 
-
-            } catch (error) {
-                statusEl.innerText = "Erro Google: " + error.message;
-            }
+            } catch (error) { statusEl.innerText = "Erro Google: " + error.message; }
         });
 
-        // Login Manual
         document.getElementById('btnAction').addEventListener('click', async () => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
@@ -146,49 +98,25 @@
                 } else {
                     if(!name) { statusEl.innerText = "Nome é obrigatório."; return; }
                     userCred = await createUserWithEmailAndPassword(auth, e, p);
-                    
-                    // Atualiza nome no Auth
                     await updateProfile(userCred.user, { displayName: name });
-                    
-                    // Salva no Firestore
                     await setDoc(doc(db, "users", userCred.user.uid), {
-                        email: e,
-                        name: name,
-                        phone: "",
-                        address: "",
-                        coins: 50,
-                        cart: [],
-                        favs: []
+                        email: e, name: name, phone: "", address: "", coins: 50, cart: [], favs: []
                     });
                 }
-                
-                statusEl.style.color = "green";
-                statusEl.innerText = "Sucesso! Entrando...";
-                await syncData(userCred.user.uid);
-                window.location.href = "index.html"; // Vai para a loja logado
-
+                statusEl.style.color = "green"; statusEl.innerText = "Sucesso!";
+                window.location.href = "index.html";
             } catch(err) {
                 statusEl.style.color = "red";
-                statusEl.innerText = tratarErro(err.message);
+                statusEl.innerText = err.message.includes('auth') ? "Erro de autenticação (Senha/Email)." : err.message;
             }
         });
 
-        async function syncData(uid) {
-            const docRef = doc(db, "users", uid);
+        async function checkAndCreateUser(user) {
+            const docRef = doc(db, "users", user.uid);
             const docSnap = await getDoc(docRef);
-            if(docSnap.exists()) {
-                const data = docSnap.data();
-                if(data.cart) localStorage.setItem('carrinho_doce_moldy', JSON.stringify(data.cart));
-                if(data.favs) localStorage.setItem('fav_doce_moldy', JSON.stringify(data.favs));
+            if (!docSnap.exists()) {
+                await setDoc(docRef, { email: user.email, name: user.displayName, coins: 50, cart: [], favs: [] });
             }
-        }
-
-        function tratarErro(msg) {
-            if(msg.includes('email-already-in-use')) return "E-mail já cadastrado.";
-            if(msg.includes('wrong-password')) return "Senha incorreta.";
-            if(msg.includes('user-not-found')) return "Usuário não encontrado.";
-            if(msg.includes('weak-password')) return "A senha deve ter 6+ caracteres.";
-            return msg;
         }
     </script>
 </body>
