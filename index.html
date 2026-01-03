@@ -6,162 +6,73 @@
     <title>Doce Moldy | Loja Oficial</title>
     <link rel="icon" type="image/png" href="icon.png">
     
-    <!-- Fontes e Ícones -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* NOVA PALETA IDÊNTICA AO ADMIN */
         :root {
-            --primary: #8B5CF6;       /* Roxo Principal */
-            --primary-dark: #7C3AED;
-            --accent: #FDE68A;        /* Amarelo Pastel */
-            --bg-body: #F3F4F6;       /* Fundo Cinza Claro */
-            --white: #FFFFFF;
-            --text-dark: #1F2937;
-            --text-gray: #6B7280;
-            --radius: 16px;
+            --primary: #8B5CF6; --primary-dark: #7C3AED;
+            --accent: #FDE68A; --bg-body: #F3F4F6;
+            --white: #FFFFFF; --text-dark: #1F2937;
+            --text-gray: #6B7280; --radius: 16px;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-dark);
-            padding-top: 100px; /* Espaço pro header fixo */
-        }
-
+        body { font-family: 'Nunito', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding-top: 100px; }
         a { text-decoration: none; color: inherit; transition: 0.2s; }
         ul { list-style: none; }
         img { max-width: 100%; display: block; }
         button { cursor: pointer; border: none; font-family: inherit; }
-
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        /* HEADER MODERNO */
-        .header-fixed {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: var(--white); z-index: 1000;
-            box-shadow: var(--shadow);
-        }
-        
-        .top-bar {
-            background: var(--text-dark); color: white;
-            text-align: center; font-size: 0.8rem; padding: 6px 0; font-weight: 700;
-        }
-
-        .nav-bar {
-            padding: 15px 0; display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem; font-weight: 800; color: var(--primary);
-            display: flex; align-items: center; gap: 8px;
-        }
+        /* HEADER */
+        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; background: var(--white); z-index: 1000; box-shadow: var(--shadow); }
+        .top-bar { background: var(--text-dark); color: white; text-align: center; font-size: 0.8rem; padding: 6px 0; font-weight: 700; }
+        .nav-bar { padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
         .logo img { height: 40px; }
-
         .menu-icons { display: flex; gap: 20px; color: var(--text-gray); }
         .menu-icons a { display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 600; }
         .menu-icons i { font-size: 1.4rem; margin-bottom: 2px; color: var(--text-dark); }
         .menu-icons a:hover i { color: var(--primary); }
 
-        /* HERO SECTION (LILÁS) */
-        .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white; padding: 40px 0; margin-bottom: 40px;
-            border-radius: 0 0 30px 30px; text-align: center;
-        }
+        /* HERO */
+        .hero { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 40px 0; margin-bottom: 40px; border-radius: 0 0 30px 30px; text-align: center; }
         .hero h1 { font-size: 2.2rem; margin-bottom: 10px; }
         .hero p { opacity: 0.9; margin-bottom: 20px; font-size: 1.1rem; }
-        .btn-hero {
-            background: var(--accent); color: var(--text-dark);
-            padding: 10px 30px; border-radius: 50px; font-weight: 800;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .btn-hero:hover { transform: translateY(-3px); background: #fff; }
-
-        /* CATEGORIAS (PÍLULAS) */
-        .cat-scroll {
-            display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 40px;
-            justify-content: center;
-        }
-        .cat-pill {
-            background: var(--white); padding: 10px 20px; border-radius: 50px;
-            font-weight: 700; color: var(--text-gray); box-shadow: var(--shadow);
-            white-space: nowrap; border: 2px solid transparent; display: flex; align-items: center; gap: 8px;
-        }
+        .btn-hero { background: var(--accent); color: var(--text-dark); padding: 10px 30px; border-radius: 50px; font-weight: 800; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        
+        /* CATEGORIAS */
+        .cat-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 40px; justify-content: center; }
+        .cat-pill { background: var(--white); padding: 10px 20px; border-radius: 50px; font-weight: 700; color: var(--text-gray); box-shadow: var(--shadow); white-space: nowrap; border: 2px solid transparent; display: flex; align-items: center; gap: 8px; }
         .cat-pill:hover { border-color: var(--primary); color: var(--primary); }
         .cat-pill i { color: var(--primary); }
 
         /* VITRINES */
-        .section-title {
-            font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;
-            display: flex; align-items: center; gap: 10px; color: var(--text-dark);
-        }
-        .section-title::before {
-            content: ''; width: 6px; height: 25px; background: var(--primary); border-radius: 4px;
-        }
-
-        .products-grid {
-            display: flex; gap: 20px; overflow-x: auto; padding: 10px 5px 30px 5px;
-            min-height: 350px; /* Evita colapso */
-        }
+        .section-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--text-dark); }
+        .section-title::before { content: ''; width: 6px; height: 25px; background: var(--primary); border-radius: 4px; }
+        .products-grid { display: flex; gap: 20px; overflow-x: auto; padding: 10px 5px 30px 5px; min-height: 350px; }
         
-        /* CARD PRODUTO (Estilo Admin) */
-        .product-card {
-            background: var(--white); min-width: 240px; max-width: 240px;
-            border-radius: var(--radius); padding: 15px;
-            box-shadow: var(--shadow); position: relative;
-            transition: 0.3s; border: 1px solid transparent;
-        }
+        /* CARD */
+        .product-card { background: var(--white); min-width: 240px; max-width: 240px; border-radius: var(--radius); padding: 15px; box-shadow: var(--shadow); position: relative; transition: 0.3s; border: 1px solid transparent; }
         .product-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-
-        .badge-offer {
-            position: absolute; top: 15px; left: 15px;
-            background: var(--accent); color: var(--text-dark);
-            font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 800;
-        }
-
-        .p-img-box {
-            height: 200px; width: 100%; border-radius: 10px;
-            background: #f9fafb; margin-bottom: 15px; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .badge-offer { position: absolute; top: 15px; left: 15px; background: var(--accent); color: var(--text-dark); font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 800; z-index: 2;}
+        .p-img-box { height: 200px; width: 100%; border-radius: 10px; background: #f9fafb; margin-bottom: 15px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;}
         .p-img-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        .p-info { text-align: left; }
-        .p-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; color: var(--text-dark); }
+        .p-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .p-price { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
         .p-old { font-size: 0.85rem; text-decoration: line-through; color: #9CA3AF; margin-right: 5px; }
-
-        .btn-add {
-            width: 100%; background: var(--primary); color: white;
-            padding: 10px; border-radius: 10px; font-weight: 700; margin-top: 10px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: 0.2s;
-        }
+        .btn-add { width: 100%; background: var(--primary); color: white; padding: 10px; border-radius: 10px; font-weight: 700; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-add:hover { background: var(--primary-dark); }
 
-        /* FOOTER */
         footer { background: var(--white); padding: 40px 0; margin-top: 50px; color: var(--text-gray); text-align: center; }
-        .float-whats {
-            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
-            background: #25D366; color: white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 999;
-        }
-
-        /* Responsivo */
-        @media(max-width: 768px) {
-            .cat-scroll { justify-content: flex-start; }
-            .hero { border-radius: 0 0 20px 20px; padding: 30px 15px; }
-        }
+        .float-whats { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 999; }
+        @media(max-width: 768px) { .cat-scroll { justify-content: flex-start; } .hero { border-radius: 0 0 20px 20px; padding: 30px 15px; } }
     </style>
 </head>
 <body>
-    <!-- HEADER IGUAL AO ANTERIOR ... -->
+
     <header class="header-fixed">
         <div class="top-bar">FRETE GRÁTIS ACIMA DE R$ 299,00 🚚</div>
         <div class="container nav-bar">
@@ -180,7 +91,7 @@
         <div class="container">
             <h1>Sua Confeitaria Profissional ✨</h1>
             <p>Os melhores cortadores e carimbos do mercado.</p>
-            <a href="#vitrine" class="btn-hero">Ver Produtos</a>
+            <a href="#sec-carimbos" class="btn-hero">Ver Catálogo</a>
         </div>
     </section>
 
@@ -193,13 +104,13 @@
             <a href="#sec-outros" class="cat-pill"><i class="fa-solid fa-star"></i> Outros</a>
         </div>
 
-        <!-- SEÇÃO 1: Carimbos de biscoito -->
+        <!-- SEÇÃO 1: Carimbos de Biscoito -->
         <div class="section-title">🍪 Carimbos de Biscoito</div>
         <div class="products-grid" id="sec-carimbos">
             <p style="padding:20px; color:#999;">Carregando...</p>
         </div>
 
-        <!-- SEÇÃO 2: Carimbinho doces -->
+        <!-- SEÇÃO 2: Carimbinhos doces -->
         <div class="section-title">🍬 Carimbinho de Doces</div>
         <div class="products-grid" id="sec-doces">
             <p style="padding:20px; color:#999;">Carregando...</p>
@@ -219,10 +130,15 @@
     </div>
 
     <footer>
-        <div class="container"><p>&copy; 2024 Doce Moldy</p></div>
+        <div class="container">
+            <p style="margin-bottom: 10px;">&copy; 2024 Doce Moldy. Todos os direitos reservados.</p>
+            <p style="font-size: 0.9rem;"><a href="admin.html" style="color:#ccc">Acesso Administrativo</a></p>
+        </div>
     </footer>
 
-    <!-- SCRIPT ATUALIZADO PARA AS NOVAS CATEGORIAS -->
+    <a href="https://wa.me/5511999999999" class="float-whats" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+
+    <!-- SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
@@ -251,7 +167,6 @@
                 const q = query(collection(db, "produtos"), orderBy("date", "desc"));
                 const sn = await getDocs(q);
                 
-                // Limpar todos os containers
                 ['sec-carimbos', 'sec-doces', 'sec-modeladores', 'sec-outros'].forEach(id => {
                     document.getElementById(id).innerHTML = "";
                 });
@@ -260,11 +175,11 @@
 
                 sn.forEach((doc) => {
                     const i = doc.data();
-                    let targetId = 'sec-outros'; // Padrão
+                    let targetId = 'sec-outros'; 
 
-                    // Mapeamento: Categoria do Admin -> ID do HTML
-                    if(i.category === 'Carimbos de biscoito') targetId = 'sec-carimbos';
-                    else if(i.category === 'Carimbinho doces') targetId = 'sec-doces';
+                    // Mapeamento EXATO (Case Sensitive)
+                    if(i.category === 'Carimbos de Biscoito') targetId = 'sec-carimbos';
+                    else if(i.category === 'Carimbinhos doces') targetId = 'sec-doces';
                     else if(i.category === 'modeladores') targetId = 'sec-modeladores';
 
                     const container = document.getElementById(targetId);
@@ -273,6 +188,10 @@
                         let imgs = Array.isArray(i.images) ? i.images : [i.img];
                         let imgCapa = imgs[0] || 'https://placehold.co/300?text=Sem+Foto';
                         let imgHover = imgs.length > 1 ? imgs[1] : imgCapa;
+
+                        // GARANTE que o caminho comece com 'Fotos/' (Maiúsculo)
+                        if(imgCapa && imgCapa.startsWith('fotos/')) imgCapa = imgCapa.replace('fotos/', 'Fotos/');
+                        if(imgHover && imgHover.startsWith('fotos/')) imgHover = imgHover.replace('fotos/', 'Fotos/');
 
                         const badge = i.old ? `<div class="badge-offer">OFERTA</div>` : '';
                         const oldHtml = i.old ? `<span class="p-old">${i.old}</span>` : '';
