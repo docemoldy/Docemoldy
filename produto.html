@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Produto | Doce Moldy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #8B5CF6; --bg-body: #F3F4F6; --text: #1F2937; }
+        body { font-family: 'Nunito', sans-serif; background: var(--bg-body); color: var(--text); padding: 40px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; padding: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        
+        /* Galeria */
+        .gallery-area { display: flex; flex-direction: column; gap: 15px; }
+        .main-img { width: 100%; height: 400px; object-fit: cover; border-radius: 15px; border: 1px solid #eee; }
+        .thumbs { display: flex; gap: 10px; overflow-x: auto; }
+        .thumb { width: 80px; height: 80px; border-radius: 10px; cursor: pointer; object-fit: cover; border: 2px solid transparent; opacity: 0.7; transition: 0.2s; }
+        .thumb:hover, .thumb.active { border-color: var(--primary); opacity: 1; }
+
+        /* Informações */
+        .info-area { display: flex; flex-direction: column; justify-content: center; }
+        .p-name { font-size: 2rem; font-weight: 800; margin-bottom: 10px; color: var(--text); }
+        .p-price { font-size: 1.8rem; color: var(--primary); font-weight: 800; margin-bottom: 20px; }
+        .p-desc { line-height: 1.6; color: #666; margin-bottom: 30px; font-size: 1rem; }
+        
+        .btn-buy { background: #25D366; color: white; padding: 15px; border-radius: 12px; font-weight: 700; text-align: center; text-decoration: none; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
+        .btn-buy:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-add-cart { background: var(--primary); margin-top: 10px; }
+
+        .back-link { margin-bottom: 20px; display: inline-block; color: #999; text-decoration: none; }
+        
+        @media(max-width: 768px) { .container { grid-template-columns: 1fr; } .main-img { height: 300px; } }
+    </style>
+</head>
+<body>
+    <div style="max-width: 1000px; margin: 0 auto;">
+        <a href="index.html" class="back-link">← Voltar para a Loja</a>
+    </div>
+
+    <div class="container">
+        <!-- Galeria -->
+        <div class="gallery-area">
+            <img src="" id="mainImg" class="main-img" onerror="this.src='https://placehold.co/500'">
+            <div class="thumbs" id="thumbsContainer">
+                <!-- Miniaturas via JS -->
+            </div>
+        </div>
+
+        <!-- Infos -->
+        <div class="info-area">
+            <h1 class="p-name" id="pName">Carregando...</h1>
+            <div class="p-price" id="pPrice"></div>
+            <p class="p-desc" id="pDesc"></p>
+            
+            <a href="#" id="btnZap" class="btn-buy" target="_blank">
+                <i class="fa-brands fa-whatsapp"></i> Comprar no WhatsApp
+            </a>
+            
+            <button id="btnAdd" class="btn-buy btn-add-cart" onclick="">
+                <i class="fa-solid fa-cart-plus"></i> Adicionar ao Carrinho
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyASxticHF-jnuOj2xcHm0Jc3P4U0ZOzF10",
+            authDomain: "doce-moldy.firebaseapp.com",
+            projectId: "doce-moldy",
+            storageBucket: "doce-moldy.firebasestorage.app",
+            messagingSenderId: "965940506290",
+            appId: "1:965940506290:web:0067cfc07ad49399eb23ab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Função para trocar imagem principal
+        window.trocarFoto = (url) => {
+            document.getElementById('mainImg').src = url;
+            // Efeito visual na borda (opcional)
+            document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        window.adicionarAoCarrinho = (nome, preco, imagem) => {
+            let carrinho = JSON.parse(localStorage.getItem('carrinho_doce_moldy')) || [];
+            carrinho.push({ nome, preco, imagem });
+            localStorage.setItem('carrinho_doce_moldy', JSON.stringify(carrinho));
+            alert("Produto adicionado ao carrinho!");
+        }
+
+        async function carregarDetalhes() {
+            // Pega o ID da URL (ex: produto.html?id=XYZ123)
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+            if(!id) {
+                document.querySelector('.container').innerHTML = "<p>Produto não encontrado.</p>";
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "produtos", id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const p = docSnap.data();
+                    
+                    // Ajuste para array de imagens
+                    let imgs = Array.isArray(p.images) ? p.images : [p.img];
+                    
+                    // Preencher dados
+                    document.getElementById('pName').innerText = p.name;
+                    document.getElementById('pPrice').innerText = p.price;
+                    document.getElementById('pDesc').innerText = p.description || "Sem descrição detalhada.";
+                    document.getElementById('mainImg').src = imgs[0];
+
+                    // Botões
+                    const zapMsg = `Olá! Vi o produto *${p.name}* no site e gostaria de saber mais.`;
+                    document.getElementById('btnZap').href = `https://wa.me/5511999999999?text=${encodeURIComponent(zapMsg)}`;
+                    
+                    document.getElementById('btnAdd').onclick = function() {
+                        window.adicionarAoCarrinho(p.name, p.price, imgs[0]);
+                    };
+
+                    // Gerar Miniaturas
+                    const thumbsDiv = document.getElementById('thumbsContainer');
+                    imgs.forEach((url, index) => {
+                        thumbsDiv.innerHTML += `
+                            <img src="${url}" class="thumb ${index===0?'active':''}" onclick="trocarFoto('${url}')">
+                        `;
+                    });
+
+                } else {
+                    document.querySelector('.container').innerHTML = "<p>Produto não existe.</p>";
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarDetalhes);
+    </script>
+</body>
+</html>

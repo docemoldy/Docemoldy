@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | Doce Moldy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* (Mantive o mesmo estilo Roxo/Amarelo anterior para não quebrar) */
+        :root { --primary: #8B5CF6; --bg: #F3F4F6; --white: #FFFFFF; --text: #1F2937; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        
+        /* LOGIN */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 50; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 20px; box-shadow: var(--shadow); width: 100%; max-width: 380px; text-align: center; }
+        .inp-login { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-login { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* SIDEBAR */
+        .sidebar { width: 250px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+        .brand { color: var(--primary); font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; text-align: left; background: none; border: none; border-radius: 10px; color: #666; font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 5px; }
+        .nav-btn:hover, .nav-btn.active { background: #EDE9FE; color: var(--primary); }
+        .btn-logout { margin-top: auto; background: #FEF2F2; color: #EF4444; }
+
+        /* CONTEUDO */
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* FORMULÁRIO */
+        .editor-container { background: white; border-radius: 16px; padding: 30px; box-shadow: var(--shadow); display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; border: 2px solid transparent; transition: 0.3s; }
+        .editor-container.editing { border-color: #F59E0B; background: #FFFBEB; }
+        .form-row { margin-bottom: 15px; }
+        label { display: block; font-size: 0.85rem; font-weight: 700; color: #4B5563; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 8px; outline: none; background: #F9FAFB; }
+        input:focus { border-color: var(--primary); background: white; }
+
+        /* BOTÃO DE PASTA MÁGICO */
+        .folder-btn { background: #EDE9FE; border: 2px dashed var(--primary); color: var(--primary); padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .folder-btn:hover { background: #DDD6FE; }
+        .folder-info { font-size: 0.8rem; margin-top: 5px; color: #666; font-weight: bold; }
+
+        .action-btns { grid-column: 1 / -1; display: flex; gap: 10px; }
+        .btn-save { flex: 1; background: var(--primary); color: white; padding: 15px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; }
+        .btn-cancel { background: #9CA3AF; color: white; padding: 15px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; display: none; }
+
+        /* LISTA PRODUTOS */
+        .grid-products { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 10px; border-radius: 12px; box-shadow: var(--shadow); position: relative; border: 1px solid transparent; }
+        .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; background: #f3f4f6; }
+        .card h4 { font-size: 0.9rem; margin: 8px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-tools { margin-top: 10px; display: flex; gap: 5px; }
+        .btn-tool { flex: 1; padding: 6px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; font-size: 0.8rem; }
+        .btn-edit { background: #F59E0B; } .btn-del { background: #EF4444; }
+
+        @media(max-width: 768px) { body { flex-direction: column; overflow: auto; } .sidebar { width: 100%; flex-direction: row; padding: 10px; } .editor-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color:var(--primary); margin-bottom:15px;">Admin Doce Moldy</h2>
+            <input type="email" id="email" class="inp-login" placeholder="E-mail">
+            <input type="password" id="password" class="inp-login" placeholder="Senha">
+            <button id="btnLogin" class="btn-login">Entrar</button>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fa-solid fa-cookie-bite"></i> DoceAdmin</div>
+        <button class="nav-btn active"><i class="fa-solid fa-box"></i> Produtos</button>
+        <button class="nav-btn" onclick="window.open('index.html')"><i class="fa-solid fa-store"></i> Ver Loja</button>
+        <button class="nav-btn btn-logout" id="btnSair"><i class="fa-solid fa-power-off"></i> Sair</button>
+    </nav>
+
+    <main class="content">
+        <div id="produtos" class="page active">
+            <h1 style="margin-bottom: 20px;">Gerenciar Produtos</h1>
+
+            <div class="editor-container" id="editorArea">
+                <h3 style="grid-column: 1/-1; margin-bottom: 10px;" id="formTitle">✨ Novo Cadastro</h3>
+                <input type="hidden" id="editId">
+                <input type="hidden" id="oldImages">
+
+                <!-- ÁREA DE UPLOAD INTELIGENTE -->
+                <div>
+                    <div class="form-row">
+                        <label>1. Selecione a PASTA do Produto (com os .webp)</label>
+                        <!-- Aceita webp, jpg, png -->
+                        <input type="file" id="folderInput" webkitdirectory directory multiple accept="image/webp, image/jpeg, image/png" style="display: none;">
+                        
+                        <div class="folder-btn" onclick="document.getElementById('folderInput').click()">
+                            <i class="fa-regular fa-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <p>Clique aqui e selecione a pasta do produto</p>
+                        </div>
+                        <p id="folderMsg" class="folder-info"></p>
+                    </div>
+
+                    <div class="form-row">
+                        <label>2. Categoria (Pasta Principal)</label>
+                        <!-- CATEGORIAS EXATAS DAS SUAS PASTAS -->
+                        <select id="pCat">
+                            <option value="Carimbos de biscoito">Carimbos de biscoito</option>
+                            <option value="Carimbinho doces">Carimbinho doces</option>
+                            <option value="modeladores">Modeladores</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                        <small style="color:#999; font-size:0.75rem;">A foto ficará em: Fotos/CATEGORIA/PRODUTO/imagem.webp</small>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="form-row">
+                        <label>Nome do Produto (Automático)</label>
+                        <input type="text" id="pName" placeholder="Preenchido ao selecionar pasta">
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <div class="form-row" style="flex:1">
+                            <label>Preço (R$)</label>
+                            <input type="text" id="pPrice" placeholder="29,90">
+                        </div>
+                        <div class="form-row" style="flex:1">
+                            <label>Antigo (Opcional)</label>
+                            <input type="text" id="pOld" placeholder="39,90">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Descrição</label>
+                        <textarea id="pDesc" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="action-btns">
+                    <button class="btn-cancel" id="btnCancel" onclick="resetForm()">Cancelar</button>
+                    <button class="btn-save" id="btnSave">Salvar Produto</button>
+                </div>
+                
+                <input type="hidden" id="generatedPaths">
+            </div>
+
+            <div style="margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+                <h3>Total Cadastrados: <span id="totalCount">0</span></h3>
+            </div>
+            
+            <div class="grid-products" id="grid">
+                <p>Carregando...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // SUA CONFIGURAÇÃO
+        const firebaseConfig = {
+            apiKey: "AIzaSyASxticHF-jnuOj2xcHm0Jc3P4U0ZOzF10",
+            authDomain: "doce-moldy.firebaseapp.com",
+            projectId: "doce-moldy",
+            storageBucket: "doce-moldy.firebasestorage.app",
+            messagingSenderId: "965940506290",
+            appId: "1:965940506290:web:0067cfc07ad49399eb23ab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- SELEÇÃO DE PASTA ---
+        document.getElementById('folderInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                // Ex: "Cortador Natal/imagem1.webp"
+                const firstPath = files[0].webkitRelativePath;
+                const folderName = firstPath.split('/')[0]; // "Cortador Natal"
+                
+                document.getElementById('pName').value = folderName;
+                
+                let fileNames = [];
+                let hasWebP = false;
+
+                for(let f of files) {
+                    if(!f.name.startsWith('.')) { // Ignora arquivos de sistema
+                        fileNames.push(f.name);
+                        if(f.name.toLowerCase().endsWith('.webp')) hasWebP = true;
+                    }
+                }
+                
+                document.getElementById('generatedPaths').value = JSON.stringify(fileNames);
+                
+                let msg = `📂 Pasta "${folderName}" selecionada com ${fileNames.length} fotos.`;
+                if(hasWebP) msg += " (Contém arquivos WebP ✅)";
+                
+                const msgEl = document.getElementById('folderMsg');
+                msgEl.innerText = msg;
+                msgEl.style.color = "#8B5CF6";
+            }
+        });
+
+        // --- SALVAR ---
+        document.getElementById('btnSave').addEventListener('click', async () => {
+            const id = document.getElementById('editId').value;
+            const nome = document.getElementById('pName').value;
+            const preco = document.getElementById('pPrice').value;
+            const old = document.getElementById('pOld').value;
+            const desc = document.getElementById('pDesc').value;
+            const cat = document.getElementById('pCat').value; 
+            
+            let finalImages = [];
+            const fileNamesJson = document.getElementById('generatedPaths').value;
+
+            if (fileNamesJson) {
+                // Monta caminho: Fotos/Categoria/Produto/Arquivo.webp
+                const fileNames = JSON.parse(fileNamesJson);
+                finalImages = fileNames.map(fName => `Fotos/${cat}/${nome}/${fName}`);
+            } else if (id && document.getElementById('oldImages').value) {
+                finalImages = JSON.parse(document.getElementById('oldImages').value);
+            } else {
+                finalImages = ["https://placehold.co/300?text=Sem+Foto"];
+            }
+
+            if(!nome || !preco) return alert("Preencha Nome e Preço!");
+
+            const btn = document.getElementById('btnSave');
+            btn.innerText = "Salvando...";
+
+            try {
+                const data = {
+                    name: nome,
+                    price: preco.includes('R$') ? preco : `R$ ${preco}`,
+                    old: old ? (old.includes('R$') ? old : `R$ ${old}`) : "",
+                    description: desc,
+                    category: cat,
+                    images: finalImages,
+                    date: Date.now()
+                };
+
+                if(id) {
+                    await updateDoc(doc(db, "produtos", id), data);
+                    alert("Atualizado!");
+                } else {
+                    await addDoc(collection(db, "produtos"), data);
+                    alert("Cadastrado!");
+                }
+                resetForm();
+                carregar();
+            } catch (e) {
+                alert("Erro: " + e.message);
+            } finally {
+                btn.innerText = "Salvar Produto";
+            }
+        });
+
+        // --- LISTAR ---
+        let produtosCache = [];
+        async function carregar() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = "Carregando...";
+            const q = query(collection(db, "produtos"), orderBy("date", "desc"));
+            const sn = await getDocs(q);
+            
+            grid.innerHTML = "";
+            produtosCache = [];
+            document.getElementById('totalCount').innerText = sn.size;
+
+            if(sn.empty) { grid.innerHTML = "Vazio."; return; }
+
+            sn.forEach(doc => {
+                const p = doc.data();
+                produtosCache.push({ id: doc.id, ...p });
+                let capa = Array.isArray(p.images) ? p.images[0] : p.img;
+                
+                grid.innerHTML += `
+                    <div class="card">
+                        <div style="font-size:0.7rem; color:#999; margin-bottom:5px;">${p.category}</div>
+                        <img src="${capa}" onerror="this.src='https://placehold.co/300'">
+                        <h4>${p.name}</h4>
+                        <span>${p.price}</span>
+                        <div class="card-tools">
+                            <button class="btn-tool btn-edit" onclick="editar('${doc.id}')">EDITAR</button>
+                            <button class="btn-tool btn-del" onclick="deletar('${doc.id}')">EXCLUIR</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.editar = (id) => {
+            const p = produtosCache.find(x => x.id === id);
+            if(!p) return;
+            document.getElementById('editId').value = p.id;
+            document.getElementById('oldImages').value = JSON.stringify(p.images);
+            document.getElementById('pName').value = p.name;
+            document.getElementById('pPrice').value = p.price.replace('R$ ', '');
+            document.getElementById('pOld').value = p.old ? p.old.replace('R$ ', '') : '';
+            document.getElementById('pDesc').value = p.description || '';
+            document.getElementById('pCat').value = p.category;
+            
+            document.getElementById('editorArea').classList.add('editing');
+            document.getElementById('formTitle').innerText = "✏️ Editando: " + p.name;
+            document.getElementById('btnSave').innerText = "Atualizar";
+            document.getElementById('btnCancel').style.display = "inline-block";
+            document.querySelector('.content').scrollTop = 0;
+        }
+
+        window.resetForm = () => {
+            document.getElementById('editId').value = "";
+            document.getElementById('oldImages').value = "";
+            document.getElementById('pName').value = "";
+            document.getElementById('pPrice').value = "";
+            document.getElementById('pOld').value = "";
+            document.getElementById('pDesc').value = "";
+            document.getElementById('folderInput').value = "";
+            document.getElementById('generatedPaths').value = "";
+            document.getElementById('folderMsg').innerText = "";
+            
+            document.getElementById('editorArea').classList.remove('editing');
+            document.getElementById('formTitle').innerText = "✨ Novo Cadastro";
+            document.getElementById('btnSave').innerText = "Salvar Produto";
+            document.getElementById('btnCancel').style.display = "none";
+        }
+
+        window.deletar = async (id) => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "produtos", id)); carregar(); } }
+
+        // --- AUTH ---
+        document.getElementById('btnLogin').addEventListener('click', () => {
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
+            signInWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
+        });
+        document.getElementById('btnSair').addEventListener('click', () => signOut(auth));
+        onAuthStateChanged(auth, u => {
+            document.getElementById('login-screen').style.display = u ? 'none' : 'flex';
+            if(u) carregar();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho | Doce Moldy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8B5CF6; 
+            --bg-body: #F3F4F6;
+            --white: #FFFFFF;
+            --text-dark: #1F2937;
+            --radius: 16px;
+        }
+        body { font-family: 'Nunito', sans-serif; background: var(--bg-body); color: var(--text-dark); padding: 40px 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: var(--white); padding: 30px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        h1 { color: var(--primary); margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f3f4f6; }
+        .item-left { display: flex; gap: 15px; align-items: center; }
+        .item-img { width: 60px; height: 60px; border-radius: 10px; background: #eee; object-fit: cover; }
+        .item-title { font-weight: 700; font-size: 1rem; }
+        .item-price { color: var(--primary); font-weight: 800; }
+        .btn-remove { color: #EF4444; background: none; border: none; cursor: pointer; font-size: 1.2rem; }
+
+        .total-area { margin-top: 30px; text-align: right; font-size: 1.5rem; font-weight: 800; }
+        
+        .btn-checkout {
+            display: block; width: 100%; background: #25D366; color: white; text-align: center;
+            padding: 15px; border-radius: 12px; font-weight: 700; font-size: 1.1rem;
+            text-decoration: none; margin-top: 20px; transition: 0.2s;
+        }
+        .btn-checkout:hover { opacity: 0.9; }
+        
+        .btn-back { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fa-solid fa-cart-shopping"></i> Seu Pedido</h1>
+        
+        <div id="lista">
+            <!-- Itens JS -->
+        </div>
+
+        <div class="total-area" id="total-area">
+            Total: <span style="color:var(--primary)" id="valor-total">R$ 0,00</span>
+        </div>
+
+        <a href="#" id="btn-whats" class="btn-checkout">
+            <i class="fa-brands fa-whatsapp"></i> Enviar Pedido no WhatsApp
+        </a>
+        <a href="index.html" class="btn-back">Continuar Comprando</a>
+    </div>
+
+    <script>
+        function carregar() {
+            const itens = JSON.parse(localStorage.getItem('carrinho_doce_moldy')) || [];
+            const lista = document.getElementById('lista');
+            const totalEl = document.getElementById('valor-total');
+            const btn = document.getElementById('btn-whats');
+            
+            lista.innerHTML = "";
+            let total = 0;
+            let msg = "Olá! Gostaria de fazer o pedido:%0A%0A";
+
+            if(itens.length === 0) {
+                lista.innerHTML = "<p style='text-align:center; padding:20px; color:#999'>Seu carrinho está vazio.</p>";
+                document.getElementById('total-area').style.display = 'none';
+                btn.style.display = 'none';
+                return;
+            }
+
+            itens.forEach((item, i) => {
+                // Tenta converter preço string em numero
+                let precoClean = parseFloat(item.preco.replace('R$', '').replace('.', '').replace(',', '.').trim()) || 0;
+                total += precoClean;
+                msg += `▪️ ${item.nome} (${item.preco})%0A`;
+
+                lista.innerHTML += `
+                    <div class="cart-item">
+                        <div class="item-left">
+                            <img src="${item.imagem}" class="item-img">
+                            <div>
+                                <div class="item-title">${item.nome}</div>
+                                <div class="item-price">${item.preco}</div>
+                            </div>
+                        </div>
+                        <button class="btn-remove" onclick="remover(${i})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+
+            let totalFormatado = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            totalEl.innerText = totalFormatado;
+            
+            msg += `%0A💰 *Total: ${totalFormatado}*`;
+            btn.href = `https://wa.me/5511999999999?text=${msg}`;
+        }
+
+        window.remover = (i) => {
+            let itens = JSON.parse(localStorage.getItem('carrinho_doce_moldy')) || [];
+            itens.splice(i, 1);
+            localStorage.setItem('carrinho_doce_moldy', JSON.stringify(itens));
+            carregar();
+        }
+
+        document.addEventListener('DOMContentLoaded', carregar);
+    </script>
+</body>
+</html>

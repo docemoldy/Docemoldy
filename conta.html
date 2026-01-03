@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Conta | Doce Moldy</title>
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #8B5CF6; 
+            --primary-dark: #7C3AED;
+            --bg-body: #F3F4F6;
+            --white: #FFFFFF;
+            --text-dark: #1F2937;
+            --radius: 16px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .login-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo-area {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 1.5rem; font-weight: 800; color: var(--primary);
+            margin-bottom: 30px;
+        }
+
+        h2 { margin-bottom: 5px; color: var(--text-dark); }
+        p { color: #6B7280; font-size: 0.9rem; margin-bottom: 25px; }
+
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 5px; color: #4B5563; }
+        
+        input {
+            width: 100%; padding: 12px;
+            border: 1px solid #E5E7EB; border-radius: 10px;
+            background: #F9FAFB; outline: none; transition: 0.3s;
+            font-family: inherit;
+        }
+        input:focus { border-color: var(--primary); background: white; }
+
+        .btn-login {
+            width: 100%; background: var(--primary); color: white;
+            padding: 12px; border: none; border-radius: 10px;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            margin-top: 10px; transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(139, 92, 246, 0.25);
+        }
+        .btn-login:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        .links { margin-top: 20px; font-size: 0.9rem; }
+        .links a { text-decoration: none; color: #6B7280; transition: 0.2s; }
+        .links a:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-area">
+            <img src="logo_site.png" style="height: 40px;" onerror="this.style.display='none'">
+            Doce Moldy
+        </div>
+
+        <h2>Bem-vindo de volta!</h2>
+        <p>Acesse sua conta para ver seus pedidos.</p>
+
+        <div class="input-group">
+            <label>E-mail</label>
+            <input type="email" placeholder="seu@email.com">
+        </div>
+
+        <div class="input-group">
+            <label>Senha</label>
+            <input type="password" placeholder="••••••••">
+        </div>
+
+        <!-- Botão simula login e leva para Admin -->
+        <button class="btn-login" onclick="window.location.href='admin.html'">
+            Entrar na Conta
+        </button>
+
+        <div class="links">
+            <a href="index.html">← Voltar para a Loja</a>
+        </div>
+    </div>
+
+</body>
+</html>
